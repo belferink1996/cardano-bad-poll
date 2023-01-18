@@ -1,26 +1,36 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+@layer base {
   body {
-    color: white;
-    background: black;
+    @apply text-gray-400;
   }
+}
+
+:root {
+  --online: #44b700;
+  --offline: #b74400;
+
+  --cardano-blue: #1231a6;
+  --discord-purple: #7289da;
+
+  --orange: rgb(255, 80, 55);
+  --pink: rgb(255, 0, 130);
+  --gradient: linear-gradient(65deg, var(--orange), var(--pink));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-size: 16px;
+  background-color: rgba(0, 0, 0, 0.1);
+  background-image: url('https://badfoxmc.com/media/landing/bg.png');
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
