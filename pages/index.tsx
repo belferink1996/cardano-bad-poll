@@ -47,6 +47,8 @@ const Page: NextPage = () => {
             <Image
               src='https://badfoxmc.com/media/logo/white_alpha.png'
               alt='logo'
+              priority
+              unoptimized
               width={logoSize}
               height={logoSize}
               className='drop-shadow-landinglogo'
@@ -59,6 +61,8 @@ const Page: NextPage = () => {
             <Image
               src='https://badfoxmc.com/media/landing/tool_fox.png'
               alt='fox'
+              priority
+              unoptimized
               width={foxSize}
               height={foxSize}
             />
@@ -70,6 +74,8 @@ const Page: NextPage = () => {
             <Image
               src='https://badfoxmc.com/media/landing/tool_bike.png'
               alt='motorcycle'
+              priority
+              unoptimized
               width={bikeSize}
               height={bikeSize / 1.7647}
             />

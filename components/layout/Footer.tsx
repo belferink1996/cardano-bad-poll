@@ -1,20 +1,17 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import React from 'react'
 
 const data = [
   {
     name: 'Cardano',
     url: 'https://cardano.org',
     logoUrl: 'https://badfoxmc.com/media/logo/other/cardano.png',
-    logoHeight: 70,
-    logoWidth: 70,
   },
   {
     name: 'Mesh',
     url: 'https://meshjs.dev',
     logoUrl: 'https://badfoxmc.com/media/logo/other/mesh.png',
-    logoHeight: 70,
-    logoWidth: 70,
   },
 ]
 
@@ -30,14 +27,15 @@ const Footer = () => {
             href={obj.url}
             target='_blank'
             rel='noopener'
-            className='m-2 flex flex-col items-center justify-center'
+            className='w-16 h-20 m-2 flex flex-col items-center justify-between'
           >
             <h6 className='mb-1 text-sm'>{obj.name}</h6>
             <Image
               src={obj.logoUrl}
               alt={obj.name}
-              width={obj.logoWidth}
-              height={obj.logoHeight}
+              unoptimized
+              width={64}
+              height={64}
               className='drop-shadow-footeritem'
             />
           </Link>
