@@ -1,7 +1,11 @@
 import React, { createContext, useState, useContext, useMemo, useEffect, ReactNode } from 'react'
 import { BrowserWallet, Wallet } from '@meshsdk/core'
 
-type ConnectFunc = (walletName: string, callback: (mainStr: string, subStr?: string) => void) => Promise<void>
+type ConnectFunc = (
+  walletName: string,
+  disableTokenGate: boolean,
+  callback: (mainStr: string, subStr?: string) => void
+) => Promise<void>
 
 const ctxInit: {
   availableWallets: Wallet[]
@@ -13,7 +17,7 @@ const ctxInit: {
   wallet: BrowserWallet
 } = {
   availableWallets: [],
-  connectWallet: async (walletName, callback) => {},
+  connectWallet: async () => {},
   connecting: false,
   connected: false,
   connectedName: '',
@@ -40,7 +44,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [hasNoKey, setHasNoKey] = useState(ctxInit.hasNoKey)
   const [wallet, setWallet] = useState<BrowserWallet>(ctxInit.wallet)
 
-  const connectWallet: ConnectFunc = async (_walletName, _cb) => {
+  const connectWallet: ConnectFunc = async (_walletName, _disableTokenGate, _cb) => {
     if (connecting) return
     setConnecting(true)
 
@@ -57,12 +61,22 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
           // Bad Key Policy ID
           if (pIds.includes('80e3ccc66f4dfeff6bc7d906eb166a984a1fc6d314e33721ad6add14')) {
+            setHasNoKey(false)
             setWallet(_wallet)
             setConnected(true)
             setConnectedName(_walletName)
           } else {
-            _cb("Wallet doesn't have a Bad Key 🔐", 'https://jpg.store/collection/badkey')
             setHasNoKey(true)
+            if (_disableTokenGate) {
+              setWallet(_wallet)
+              setConnected(true)
+              setConnectedName(_walletName)
+            } else {
+              setWallet(ctxInit.wallet)
+              setConnected(ctxInit.connected)
+              setConnectedName(ctxInit.connectedName)
+              _cb("Wallet doesn't have a Bad Key 🔐", 'https://jpg.store/collection/badkey')
+            }
           }
         } else {
           _cb("Wallet isn't connected to mainnet")
