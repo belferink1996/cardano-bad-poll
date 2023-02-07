@@ -12,7 +12,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <meta
           name='description'
-          content='A web3 tool designed to make governance on Cardano easy and accesible to everyone!'
+          content='A web3 tool designed to make governance on Cardano easy and accessible to everyone!'
         />
 
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />

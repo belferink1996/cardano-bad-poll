@@ -3,7 +3,13 @@ import { Fragment, useState } from 'react'
 import { useWallet } from '../contexts/WalletContext'
 import Modal from './layout/Modal'
 
-const ConnectWallet = ({ addTranscript }: { addTranscript: (msg: string, key?: string) => void }) => {
+const ConnectWallet = ({
+  addTranscript,
+  disableTokenGate = false,
+}: {
+  addTranscript: (msg: string, key?: string) => void
+  disableTokenGate?: boolean
+}) => {
   const { availableWallets, connectWallet, connecting, connected, hasNoKey } = useWallet()
   const [openModal, setOpenModal] = useState<boolean>(false)
 
@@ -32,7 +38,7 @@ const ConnectWallet = ({ addTranscript }: { addTranscript: (msg: string, key?: s
               <button
                 key={`connect-wallet-${wallet.name}`}
                 onClick={() =>
-                  connectWallet(wallet.name, (str1, str2) => {
+                  connectWallet(wallet.name, disableTokenGate, (str1, str2) => {
                     if (!str2) {
                       addTranscript('ERROR', str1)
                     } else {

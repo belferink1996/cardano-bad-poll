@@ -8,7 +8,14 @@ const About = () => {
   return (
     <div className='my-4 mx-2 md:mx-10 max-w-2xl lg:max-w-lg text-gray-300'>
       <h2 className='text-xl mb-4'>About The Tool:</h2>
-      <p className='my-4 text-sm'>Bad Poll is responsible for...</p>
+      <p className='my-4 text-sm'>
+        Bad Poll is responsible for governing web3 communities. It weighs the vote of a connected wallet, based on
+        it&apos;s held assets.
+      </p>
+      <p className='my-4 text-sm'>
+        The way it does this, is simply by reading the Cardano wallet, and comparing the data with the poll
+        creator&apos;s settings.
+      </p>
 
       <Link
         href='/tool'
@@ -35,7 +42,7 @@ const Page: NextPage = () => {
 
   return (
     <div className='px-4 flex flex-col items-center'>
-      <div id='home' className='relative w-screen h-[75vh] md:h-[90vh]'>
+      <div id='home' className='relative w-screen h-[calc(100vh-85px)] md:h-[calc(100vh-95px)]'>
         <div className='absolute z-10'>
           <div className='hidden lg:block animate__animated animate__fadeInRight'>
             <About />
@@ -48,7 +55,6 @@ const Page: NextPage = () => {
               src='https://badfoxmc.com/media/logo/white_alpha.png'
               alt='logo'
               priority
-              unoptimized
               width={logoSize}
               height={logoSize}
               className='drop-shadow-landinglogo'
@@ -56,13 +62,12 @@ const Page: NextPage = () => {
           </div>
         </div>
 
-        <div className='absolute bottom-0 right-12'>
+        <div className='absolute bottom-0 right-0 md:right-12'>
           <div className='animate__animated animate__fadeInDown'>
             <Image
               src='https://badfoxmc.com/media/landing/tool_fox.png'
               alt='fox'
               priority
-              unoptimized
               width={foxSize}
               height={foxSize}
             />
@@ -75,7 +80,6 @@ const Page: NextPage = () => {
               src='https://badfoxmc.com/media/landing/tool_bike.png'
               alt='motorcycle'
               priority
-              unoptimized
               width={bikeSize}
               height={bikeSize / 1.7647}
             />
