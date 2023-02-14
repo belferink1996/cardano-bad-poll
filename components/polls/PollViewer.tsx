@@ -46,14 +46,12 @@ const PollViewer = (props: PollViewerProps) => {
     <div>
       {poll.description ? (
         <p className='w-full mb-2 py-2 px-4 text-xs bg-gray-900 bg-opacity-50 rounded-xl border border-gray-700'>
-          {poll.description.split('\n').map((str, idx) =>
-            str ? (
-              <Fragment key={`str-${idx}-${str}`}>
-                {str}
-                <br />
-              </Fragment>
-            ) : null
-          )}
+          {poll.description.split('\n').map((str, idx) => (
+            <Fragment key={`str-${idx}-${str}`}>
+              {str}
+              <br />
+            </Fragment>
+          ))}
         </p>
       ) : null}
 
