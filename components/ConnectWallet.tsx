@@ -5,9 +5,11 @@ import Modal from './layout/Modal'
 
 const ConnectWallet = ({
   addTranscript,
+  disabled = false,
   disableTokenGate = false,
 }: {
   addTranscript: (msg: string, key?: string) => void
+  disabled?: boolean
   disableTokenGate?: boolean
 }) => {
   const { availableWallets, connectWallet, connecting, connected, hasNoKey } = useWallet()
@@ -17,7 +19,7 @@ const ConnectWallet = ({
     <Fragment>
       <button
         type='button'
-        disabled={connecting || connected || hasNoKey}
+        disabled={disabled || connecting || connected || hasNoKey}
         onClick={() => setOpenModal(true)}
         className='grow m-1 p-4 rounded-xl disabled:bg-gray-900 bg-green-900 hover:bg-green-700 disabled:bg-opacity-50 bg-opacity-50 hover:bg-opacity-50 disabled:text-gray-700 hover:text-gray-200 disabled:border border hover:border disabled:border-gray-800 border-green-700 hover:border-green-700 disabled:cursor-not-allowed hover:cursor-pointer'
       >

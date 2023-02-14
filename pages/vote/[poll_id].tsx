@@ -1,8 +1,8 @@
 import type { NextPage } from 'next'
-import TheTool from '../components/TheTool'
+import SinglePoll from '../../components/polls/SinglePoll'
 
 const Page: NextPage = () => {
-  return <TheTool />
+  return <SinglePoll />
 }
 
 export default Page
