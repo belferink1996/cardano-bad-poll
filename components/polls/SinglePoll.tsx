@@ -253,56 +253,62 @@ const SinglePoll = () => {
   const castVote = useCallback(
     async (serialNumber: number) => {
       if (!active || !connected) return
-      setLoading(true)
-      toast.loading('Processing...')
+      if (
+        window.confirm(
+          `Are you sure you want to cast ${holderVote.points} points to option #${serialNumber}?\nCasted points are permanent!\nEvery asset can only be used once!`
+        )
+      ) {
+        setLoading(true)
+        toast.loading('Processing...')
 
-      if (poll && holderVote.points) {
-        try {
-          addTranscript('Processing voting points', 'This may take a moment...')
+        if (poll && holderVote.points) {
+          try {
+            addTranscript('Processing voting points', 'This may take a moment...')
 
-          const {
-            data: { now },
-          } = await axios.get<FetchedTimestampResponse>(`/api/timestamp`)
+            const {
+              data: { now },
+            } = await axios.get<FetchedTimestampResponse>(`/api/timestamp`)
 
-          if (now >= poll.endAt) {
-            setActive(false)
-            addTranscript('Poll expired (inactive)')
-            return
+            if (now >= poll.endAt) {
+              setActive(false)
+              addTranscript('Poll expired (inactive)')
+              return
+            }
+
+            const collection = firestore.collection(POLLS_DB_PATH)
+
+            const { FieldValue } = firebase.firestore
+            const incrementPoints = FieldValue.increment(holderVote.points)
+            const arrayUnionUnits = FieldValue.arrayUnion(...holderVote.units)
+
+            const payload = {
+              [`vote_${serialNumber}`]: incrementPoints,
+              usedUnits: arrayUnionUnits,
+            }
+
+            await collection.doc(poll?.id).update(payload)
+
+            addTranscript(
+              'Success! You can now leave the app 👍',
+              `Casted ${holderVote.points} points to option #${serialNumber}, with a total of ${holderVote.units.length} assets`
+            )
+            setHolderVote({
+              points: 0,
+              units: [],
+            })
+
+            toast.dismiss()
+            toast.success('Voted!')
+          } catch (error: any) {
+            console.error(error)
+            addTranscript('ERROR', error.message)
+            toast.dismiss()
+            toast.error('Woopsies!')
           }
-
-          const collection = firestore.collection(POLLS_DB_PATH)
-
-          const { FieldValue } = firebase.firestore
-          const incrementPoints = FieldValue.increment(holderVote.points)
-          const arrayUnionUnits = FieldValue.arrayUnion(...holderVote.units)
-
-          const payload = {
-            [`vote_${serialNumber}`]: incrementPoints,
-            usedUnits: arrayUnionUnits,
-          }
-
-          await collection.doc(poll?.id).update(payload)
-
-          addTranscript(
-            'Success! You can now leave the app 👍',
-            `Casted ${holderVote.points} points to option #${serialNumber}, with a total of ${holderVote.units.length} assets`
-          )
-          setHolderVote({
-            points: 0,
-            units: [],
-          })
-
-          toast.dismiss()
-          toast.success('Voted!')
-        } catch (error: any) {
-          console.error(error)
-          addTranscript('ERROR', error.message)
-          toast.dismiss()
-          toast.error('Woopsies!')
         }
-      }
 
-      setLoading(false)
+        setLoading(false)
+      }
     },
     [active, connected, poll, holderVote]
   )
