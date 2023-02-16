@@ -15,7 +15,6 @@ import { POLLS_DB_PATH, TOOLS_PROD_CODE } from '../../constants'
 
 const TheTool = () => {
   const { connected, hasNoKey, wallet } = useWallet()
-
   const [transcripts, setTranscripts] = useState<Transcript[]>([])
 
   const addTranscript = (msg: string, key?: string) => {
