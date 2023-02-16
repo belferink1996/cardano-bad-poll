@@ -1,4 +1,5 @@
 import type { NextPage } from 'next'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
@@ -7,7 +8,6 @@ import { RankedPolicyAsset } from '../../utils/cnftTools'
 import { firebase, firestore } from '../../utils/firebase'
 import { useWallet } from '../../contexts/WalletContext'
 import ConnectWallet from '../../components/ConnectWallet'
-import PollViewer from '../../components/polls/PollViewer'
 import TranscriptsViewer, { Transcript } from '../../components/TranscriptsViewer'
 import { HolderSettingsType } from '../../components/TheTool/Settings/HolderSettings'
 import { FetchedTimestampResponse } from '../../pages/api/timestamp'
@@ -15,6 +15,7 @@ import { FetchedAssetResponse } from '../../pages/api/asset/[asset_id]'
 import { PolicyRankedAssetsResponse } from '../../pages/api/policy/[policy_id]/ranks'
 import { Poll } from '../../@types'
 import { POLLS_DB_PATH } from '../../constants'
+const PollViewer = dynamic(() => import('../../components/polls/PollViewer'), { ssr: false })
 
 const fetchPoll = async (_pollId: string, overrideNow?: number) => {
   if (!_pollId) {
@@ -377,6 +378,32 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
             </button>
           ))}
         </Fragment>
+      </div>
+
+      <div className='mt-4 flex flex-col items-center justify-center'>
+        <h6>Who can vote?</h6>
+
+        {poll.holderSettings.map((setting) => (
+          <div key={`holderSetting-${setting.policyId}`} className='text-xs my-2'>
+            <p className='text-gray-200'>{setting.policyId}</p>
+            <p>Policy ID ({setting.weight} points)</p>
+            {setting.withRanks
+              ? setting.rankOptions.map((rankSetting) => (
+                  <p key={`rankSetting-${rankSetting.minRange}-${rankSetting.maxRange}`}>
+                    Ranks: {rankSetting.minRange}-{rankSetting.maxRange} ({rankSetting.amount} points)
+                  </p>
+                ))
+              : null}
+
+            {setting.withTraits
+              ? setting.traitOptions.map((traitSetting) => (
+                  <p key={`traitSetting-${traitSetting.category}-${traitSetting.trait}`}>
+                    Attribute: {traitSetting.category} / {traitSetting.trait} ({traitSetting.amount} points)
+                  </p>
+                ))
+              : null}
+          </div>
+        ))}
       </div>
     </div>
   )
