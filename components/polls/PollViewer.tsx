@@ -67,15 +67,19 @@ const PollViewer = (props: PollViewerProps) => {
             </p>
 
             {poll.active ? null : (
-              <div className='w-full h-fit mb-2 bg-gray-700 rounded-full'>
+              <div className='w-full h-fit mb-2 bg-transparent rounded-full'>
                 <div
                   className={
-                    'leading-3 rounded-full ' +
-                    (pointAllocation.winner === obj.serial ? 'bg-green-800' : 'bg-red-800')
+                    'leading-4 rounded-full bg-opacity-50 ' +
+                    (pointAllocation.winner === obj.serial ? 'bg-green-600' : 'bg-red-600')
                   }
                   style={{ width: `${pointAllocation[`vote_${obj.serial}`]}%` }}
                 >
-                  <span className='ml-1 text-[10px] text-gray-200 font-light'>
+                  <span
+                    className={
+                      'ml-2 text-xs ' + (pointAllocation.winner === obj.serial ? 'text-green-200' : 'text-red-200')
+                    }
+                  >
                     {pointAllocation[`vote_${obj.serial}`]}%
                   </span>
                 </div>
