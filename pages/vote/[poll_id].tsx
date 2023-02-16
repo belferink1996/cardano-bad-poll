@@ -44,7 +44,7 @@ const fetchPoll = async (_pollId: string, overrideNow?: number) => {
   return payload
 }
 
-export async function getServerSideProps(ctx: any) {
+export const getServerSideProps = async (ctx: any) => {
   const poll = await fetchPoll(ctx.query.poll_id, Date.now())
 
   return { props: { poll } }
