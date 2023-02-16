@@ -181,10 +181,6 @@ const TheTool = () => {
   }, [loadWallet])
 
   const clickPublish = useCallback(async () => {
-    toast.error('Offline - coming soon™️')
-    addTranscript('Offline - coming soon™️')
-    return
-
     setErrorMessage('')
     setLoading(true)
     toast.loading('Processing...')
