@@ -38,7 +38,7 @@ const PollViewer = (props: PollViewerProps) => {
   }, [poll])
 
   const timer = useTimer({
-    expiryTimestamp: new Date(poll.endAt),
+    expiryTimestamp: new Date(poll.active ? poll.endAt : 0),
     onExpire: () => callbackTimerExpired(),
   })
 
