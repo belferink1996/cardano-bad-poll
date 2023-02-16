@@ -74,7 +74,7 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
 
   const [loading, setLoading] = useState(false)
   const [poll, setPoll] = useState<Poll | null | undefined>(props.poll)
-  const [active, setActive] = useState(false)
+  const [active, setActive] = useState(props.poll?.active || false)
   const [holderVote, setHolderVote] = useState<{ points: number; units: string[] }>({ points: 0, units: [] })
 
   const fetchAndSetPoll = useCallback(async (_pollId: string) => {
@@ -105,7 +105,18 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
   }, [])
 
   useEffect(() => {
-    if (pollId && !poll) fetchAndSetPoll(pollId)
+    if (pollId) {
+      if (!poll) {
+        fetchAndSetPoll(pollId)
+      } else if (poll.active) {
+        addTranscript(
+          'Welcome, please connect your wallet.',
+          'Your wallet will be scanned to verify your vote eligibility & weight'
+        )
+      } else {
+        addTranscript('Poll expired (inactive)')
+      }
+    }
   }, [pollId, poll, fetchAndSetPoll])
 
   const fetchRankedAssets = useCallback(async (_policyId: string): Promise<RankedPolicyAsset[]> => {
