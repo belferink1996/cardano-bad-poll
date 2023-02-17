@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { DAYS, HOURS, MINUTES, MONTHS, WEEKS, YEARS } from '../../constants'
+import { DAYS, HOURS, MINUTES, MONTHS, WEEKS } from '../../constants'
 
 export interface FetchedTimestampResponse {
   now: number
@@ -40,12 +40,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<FetchedTimestam
           }
 
           case MONTHS: {
-            endAt = new Date(now + 60000 * 60 * 24 * 7 * 12 * endAmount).getTime()
-            break
-          }
-
-          case YEARS: {
-            endAt = new Date(now + 60000 * 60 * 24 * 7 * 12 * 365 * endAmount).getTime()
+            endAt = new Date(now + 60000 * 60 * 24 * 7 * 4 * endAmount).getTime()
             break
           }
 

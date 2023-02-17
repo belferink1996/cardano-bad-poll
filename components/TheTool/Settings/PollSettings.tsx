@@ -1,8 +1,8 @@
 import { ChevronDownIcon, PlusCircleIcon, TrashIcon } from '@heroicons/react/24/solid'
 import React, { useEffect, useState } from 'react'
-import { MINUTES, DAYS, HOURS, MONTHS, WEEKS, YEARS } from '../../../constants'
+import { MINUTES, DAYS, HOURS, MONTHS, WEEKS } from '../../../constants'
 
-export type EndAtPeriod = typeof MINUTES | typeof HOURS | typeof DAYS | typeof WEEKS | typeof MONTHS | typeof YEARS
+export type EndAtPeriod = typeof MINUTES | typeof HOURS | typeof DAYS | typeof WEEKS | typeof MONTHS
 
 export interface AnswerOptionType {
   answer: string
@@ -203,7 +203,7 @@ const PollSettings = (props: PollSettingsProps) => {
               ' flex-col max-h-56 overflow-y-auto absolute top-14 z-20 w-full p-3 rounded-lg bg-gray-900 border border-gray-700'
             }
           >
-            {[MINUTES, HOURS, DAYS, WEEKS, MONTHS, YEARS].map((val) => (
+            {[MINUTES, HOURS, DAYS, WEEKS, MONTHS].map((val) => (
               <button
                 key={`period-${val}`}
                 type='button'
