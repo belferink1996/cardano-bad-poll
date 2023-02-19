@@ -175,6 +175,7 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
       if (!eligiblePolicyIds.length) {
         addTranscript("You aren't eligible to vote this poll", "You don't own any of the required Policy IDs")
         setLoading(false)
+        toast.dismiss()
         return
       }
 
@@ -299,6 +300,7 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
             if (now >= poll.endAt) {
               setActive(false)
               addTranscript('Poll expired (inactive)')
+              toast.dismiss()
               return
             }
 
