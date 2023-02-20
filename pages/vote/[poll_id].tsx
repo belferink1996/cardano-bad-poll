@@ -75,7 +75,8 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
 
   const [loading, setLoading] = useState(false)
   const [poll, setPoll] = useState<Poll | null | undefined>(props.poll)
-  const [active, setActive] = useState(props.poll?.active || false)
+  const [pollActive, setPollActive] = useState(props.poll?.active || false)
+  const [holderEligible, setHolderEligible] = useState(false)
   const [holderVote, setHolderVote] = useState<{ points: number; units: string[] }>({ points: 0, units: [] })
 
   const fetchAndSetPoll = useCallback(async (_pollId: string) => {
@@ -88,13 +89,13 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
         setPoll(payload)
 
         if (payload.active) {
-          setActive(true)
+          setPollActive(true)
           addTranscript(
             'Welcome, please connect your wallet.',
             'Your wallet will be scanned to verify your vote eligibility & weight'
           )
         } else {
-          setActive(false)
+          setPollActive(false)
           addTranscript('Poll expired (inactive)')
         }
       }
@@ -155,7 +156,7 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
   }, [])
 
   const loadWallet = useCallback(async () => {
-    if (!active || !connected) return
+    if (!connected) return
     setLoading(true)
     toast.loading('Processing...')
 
@@ -173,13 +174,22 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
       }
 
       if (!eligiblePolicyIds.length) {
-        addTranscript("You aren't eligible to vote this poll", "You don't own any of the required Policy IDs")
         setLoading(false)
+        setHolderEligible(false)
+        addTranscript("You aren't eligible to vote this poll", "You don't own any of the required Policy IDs")
+        toast.dismiss()
+        return
+      } else {
+        setHolderEligible(true)
+      }
+
+      addTranscript(`Found ${eligiblePolicyIds.length} eligible Policy IDs`)
+
+      if (!pollActive) {
         toast.dismiss()
         return
       }
 
-      addTranscript(`Found ${eligiblePolicyIds.length} eligible Policy IDs`)
       addTranscript('Processing voting points', 'This may take a moment...')
 
       let votePoints = 0
@@ -276,11 +286,16 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
     }
 
     setLoading(false)
-  }, [active, connected, wallet, poll, fetchRankedAssets, fetchAsset])
+  }, [pollActive, connected, wallet, poll, fetchRankedAssets, fetchAsset])
+
+  useEffect(() => {
+    if (!loading) loadWallet()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadWallet])
 
   const castVote = useCallback(
     async (serialNumber: number) => {
-      if (!active || !connected) return
+      if (!pollActive || !connected) return
       if (
         window.confirm(
           `Are you sure you want to cast ${holderVote.points} points to option #${serialNumber}?\nCasted points are permanent!\nEvery asset can only be used once!`
@@ -298,7 +313,7 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
             } = await axios.get<FetchedTimestampResponse>(`/api/timestamp`)
 
             if (now >= poll.endAt) {
-              setActive(false)
+              setPollActive(false)
               addTranscript('Poll expired (inactive)')
               toast.dismiss()
               return
@@ -339,13 +354,8 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
         setLoading(false)
       }
     },
-    [active, connected, poll, holderVote]
+    [pollActive, connected, poll, holderVote]
   )
-
-  useEffect(() => {
-    if (!loading) loadWallet()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadWallet])
 
   if (!poll) {
     return <div className='flex items-center justify-center'>Poll does not exist...</div>
@@ -355,32 +365,44 @@ const Page: NextPage = (props: { poll?: Poll | null }) => {
     <div className='w-[80vw] md:w-[690px] mx-auto'>
       <TranscriptsViewer transcripts={transcripts} />
       <div className='w-full mb-4 flex flex-wrap items-center justify-evenly'>
-        <ConnectWallet disabled={!active} disableTokenGate addTranscript={addTranscript} />
+        <ConnectWallet
+          disabled={!pollActive && poll.allowPublicView}
+          disableTokenGate
+          addTranscript={addTranscript}
+        />
       </div>
 
-      <PollViewer
-        poll={poll}
-        callbackTimerExpired={() => {
-          setActive(false)
-          fetchAndSetPoll(pollId)
-        }}
-      />
-
-      <div className='w-full mt-2 flex flex-wrap items-center justify-evenly'>
+      {poll.allowPublicView || holderEligible ? (
         <Fragment>
-          {poll.options.map((obj) => (
-            <button
-              key={`click-option-${obj.serial}`}
-              type='button'
-              disabled={!connected || !active || !holderVote.points || loading}
-              onClick={() => castVote(obj.serial)}
-              className='grow m-1 p-4 disabled:cursor-not-allowed disabled:bg-gray-900 disabled:bg-opacity-50 disabled:border-gray-800 disabled:text-gray-700 rounded-xl bg-green-900 hover:bg-green-700 bg-opacity-50 hover:bg-opacity-50 hover:text-gray-200 disabled:border border hover:border border-green-700 hover:border-green-700 hover:cursor-pointer'
-            >
-              Vote #{obj.serial}
-            </button>
-          ))}
+          <PollViewer
+            poll={poll}
+            callbackTimerExpired={() => {
+              setPollActive(false)
+              fetchAndSetPoll(pollId)
+            }}
+          />
+
+          <div className='w-full mt-2 flex flex-wrap items-center justify-evenly'>
+            {poll.options.map((obj) => (
+              <button
+                key={`click-option-${obj.serial}`}
+                type='button'
+                disabled={!connected || !pollActive || !holderVote.points || loading}
+                onClick={() => castVote(obj.serial)}
+                className='grow m-1 p-4 disabled:cursor-not-allowed disabled:bg-gray-900 disabled:bg-opacity-50 disabled:border-gray-800 disabled:text-gray-700 rounded-xl bg-green-900 hover:bg-green-700 bg-opacity-50 hover:bg-opacity-50 hover:text-gray-200 disabled:border border hover:border border-green-700 hover:border-green-700 hover:cursor-pointer'
+              >
+                Vote #{obj.serial}
+              </button>
+            ))}
+          </div>
         </Fragment>
-      </div>
+      ) : (
+        <p className='my-8 text-center text-red-400'>
+          This poll is classified, and cannot be seen by the public eye,
+          <br />
+          please connect your wallet.
+        </p>
+      )}
 
       <div className='mt-4 flex flex-col items-center justify-center'>
         <h6>Who can vote?</h6>

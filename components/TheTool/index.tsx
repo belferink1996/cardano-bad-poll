@@ -233,6 +233,7 @@ const TheTool = () => {
 
       const res = await collection.add({
         stakeKey: connectedStakeKey,
+        allowPublicView: settings?.pollSettings.allowPublicView,
         endAt,
         holderSettings: settings?.holderSettings,
         description: settings?.pollSettings.description || '',

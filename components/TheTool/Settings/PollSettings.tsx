@@ -17,6 +17,7 @@ export interface PollSettingsType {
     amount: number
     period: EndAtPeriod
   }
+  allowPublicView: boolean
 }
 
 interface PollSettingsProps {
@@ -38,6 +39,7 @@ export const INIT_POLL_SETTINGS: PollSettingsType = {
     amount: 0,
     period: HOURS,
   },
+  allowPublicView: true,
 }
 
 const PollSettings = (props: PollSettingsProps) => {
@@ -54,6 +56,39 @@ const PollSettings = (props: PollSettingsProps) => {
   return (
     <div className='w-full mb-4'>
       <h3 className={'text-lg ' + (disabled ? 'text-gray-700' : '')}>Step 1 - Poll configuration</h3>
+
+      <div>
+        <label
+          className={
+            'mr-4 flex items-center ' +
+            (disabled ? 'text-gray-700 cursor-not-allowed' : 'hover:text-white cursor-pointer')
+          }
+        >
+          <input
+            type='checkbox'
+            disabled={disabled}
+            checked={pollSettings.allowPublicView}
+            onChange={(e) =>
+              setPollSettings((prev) => {
+                return {
+                  ...prev,
+                  allowPublicView: e.target.checked,
+                }
+              })
+            }
+            className='disabled:opacity-50'
+          />
+
+          <span className='ml-1 text-sm'>
+            Allow the public to view this poll & it&apos;s results? (only holders can vote)
+          </span>
+        </label>
+        <span className={'text-xs ' + (disabled ? 'text-gray-700' : 'text-green-400')}>
+          Public {pollSettings.allowPublicView ? 'can' : 'cannot'} see.
+        </span>
+      </div>
+
+      <div className={(disabled ? 'bg-gray-800 ' : 'bg-gray-400 ') + 'w-3/4 h-0.5 my-4 mx-auto rounded-full'} />
 
       <textarea
         placeholder='Description (optional)'

@@ -8,8 +8,10 @@ import { POLLS_DB_PATH } from '../../constants'
 export const getServerSideProps = async (ctx: any) => {
   const now = Date.now()
   const collection = firestore.collection(POLLS_DB_PATH)
-  const collectionQuery = await collection.get()
-  // const collectionQuery = await collection.where('endAt', '>', now).get()
+  const collectionQuery = await collection
+    .where('allowPublicView', '==', true)
+    // .where('endAt', '>', now)
+    .get()
 
   const polls = collectionQuery.docs
     .map((doc) => {
