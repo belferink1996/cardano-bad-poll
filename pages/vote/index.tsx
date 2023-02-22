@@ -9,7 +9,7 @@ export const getServerSideProps = async (ctx: any) => {
   const now = Date.now()
   const collection = firestore.collection(POLLS_DB_PATH)
   const collectionQuery = await collection
-    .where('allowPublicView', '==', true)
+    // .where('allowPublicView', '==', true)
     // .where('endAt', '>', now)
     .get()
 
@@ -23,7 +23,7 @@ export const getServerSideProps = async (ctx: any) => {
         id: doc.id,
       }
     })
-    .sort((a, b) => a.endAt - b.endAt)
+    .sort((a, b) => (b.active ? a.endAt : b.endAt) - (a.active ? b.endAt : a.endAt))
     .sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0))
 
   return { props: { polls } }
@@ -46,7 +46,7 @@ const Page: NextPage = (props: { polls?: Poll[] }) => {
               <p className={(poll.active ? 'text-green-400' : 'text-red-400') + ' mb-1'}>
                 {poll.active ? 'Active until:' : 'Ended at:'} {new Date(poll.endAt).toUTCString()}
               </p>
-              <p>{poll.question}</p>
+              <p>{poll.allowPublicView ? poll.question : 'CLASSIFIED'}</p>
             </div>
           ))}
     </div>

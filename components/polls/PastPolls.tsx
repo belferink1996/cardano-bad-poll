@@ -40,7 +40,7 @@ const PastPolls = (props: PastPollsProps) => {
             id: doc.id,
           }
         })
-        .sort((a, b) => a.endAt - b.endAt)
+        .sort((a, b) => (b.active ? a.endAt : b.endAt) - (a.active ? b.endAt : a.endAt))
         .sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0))
 
       setPolls(payload)
