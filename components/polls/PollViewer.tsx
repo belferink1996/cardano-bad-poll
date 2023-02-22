@@ -7,14 +7,28 @@ interface PollViewerProps {
   callbackTimerExpired: () => void
 }
 
+interface Pointallocation {
+  totalPoints: number
+  winnerSerialNumber: number
+  allocation: {
+    [key: string]: {
+      points: number
+      percent: number
+    }
+  }
+}
+
 const PollViewer = (props: PollViewerProps) => {
   const { poll, callbackTimerExpired } = props
-  const [pointAllocation, setPointAllocation] = useState<Record<string, number>>({})
+  const [pointAllocation, setPointAllocation] = useState<Pointallocation>({
+    totalPoints: 0,
+    winnerSerialNumber: 0,
+    allocation: {},
+  })
 
   useEffect(() => {
-    let totalPoints = 0
     const most = { points: 0, serial: 0 }
-    const payload: Record<string, number> = {}
+    const payload: Pointallocation = { totalPoints: 0, winnerSerialNumber: 0, allocation: {} }
 
     poll.options.forEach((obj) => {
       const key = `vote_${obj.serial}`
@@ -25,14 +39,18 @@ const PollViewer = (props: PollViewerProps) => {
         most.serial = obj.serial
       }
 
-      payload[key] = points
-      totalPoints += points
+      if (!payload.allocation[key]) {
+        payload.allocation[key] = { points: 0, percent: 0 }
+      }
+
+      payload.allocation[key].points = points
+      payload['totalPoints'] += points
     })
 
-    Object.entries(payload).forEach(([key, val]) => {
-      payload[key] = Math.round((100 / totalPoints) * val)
+    Object.entries(payload.allocation).forEach(([key, obj]) => {
+      payload.allocation[key].percent = Math.round((100 / payload['totalPoints']) * obj.points)
     })
-    payload['winner'] = most.serial
+    payload['winnerSerialNumber'] = most.serial
 
     setPointAllocation(payload)
   }, [poll])
@@ -58,35 +76,42 @@ const PollViewer = (props: PollViewerProps) => {
       <div className='w-full py-2 px-4 text-sm bg-gray-900 bg-opacity-50 rounded-xl border border-gray-700'>
         <p className='my-2 mb-2 text-gray-200'>{poll.question}</p>
 
-        {poll.options.map((obj) => (
-          <Fragment key={`read-option-${obj.serial}`}>
-            <div className='w-full h-0.5 bg-gray-800 rounded-full' />
+        {poll.options.map((obj) => {
+          const isActive = poll.active
+          const isWinner = pointAllocation['winnerSerialNumber'] === obj.serial
+          const percentValue = pointAllocation.allocation[`vote_${obj.serial}`]?.percent || 0
+          const pointValue = pointAllocation.allocation[`vote_${obj.serial}`]?.points || 0
 
-            <p className='my-2'>
-              <span className='text-gray-200 font-bold'>{obj.serial}.</span> {obj.answer}
-            </p>
+          return (
+            <Fragment key={`read-option-${obj.serial}`}>
+              <div className='w-full h-0.5 my-2 bg-gray-800 rounded-full' />
 
-            {poll.active ? null : (
-              <div className='w-full h-fit mb-2 bg-transparent rounded-full'>
-                <div
-                  className={
-                    'leading-4 rounded-full bg-opacity-50 ' +
-                    (pointAllocation.winner === obj.serial ? 'bg-green-600' : 'bg-red-600')
-                  }
-                  style={{ width: `${pointAllocation[`vote_${obj.serial}`]}%` }}
-                >
-                  <span
+              <p className={isActive ? '' : isWinner ? 'text-green-200 font-bold' : 'text-red-200'}>
+                <span className='text-gray-200 font-bold'>{obj.serial}.</span> {obj.answer}
+              </p>
+
+              {isActive ? null : (
+                <div className='w-full h-fit bg-transparent rounded-full'>
+                  <div
                     className={
-                      'ml-2 text-xs ' + (pointAllocation.winner === obj.serial ? 'text-green-200' : 'text-red-200')
+                      'leading-4 rounded-full bg-opacity-50 ' + (isWinner ? 'bg-green-600' : 'bg-red-600')
                     }
+                    style={{ width: `${percentValue}%` }}
                   >
-                    {pointAllocation[`vote_${obj.serial}`]}%
-                  </span>
+                    <span
+                      className={
+                        'ml-2 whitespace-nowrap text-[11px] ' + (isWinner ? 'text-green-200' : 'text-red-200')
+                      }
+                    >
+                      {percentValue}%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;({pointValue}&nbsp;/&nbsp;
+                      {pointAllocation.totalPoints}&nbsp;points)
+                    </span>
+                  </div>
                 </div>
-              </div>
-            )}
-          </Fragment>
-        ))}
+              )}
+            </Fragment>
+          )
+        })}
       </div>
 
       <table className={'mx-auto mt-2 text-center ' + (poll.active ? 'text-gray-400' : 'text-gray-700')}>
