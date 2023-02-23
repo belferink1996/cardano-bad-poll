@@ -11,7 +11,7 @@ import Settings, { SettingsType } from './Settings'
 import { PolicyAssetsResponse } from '../../pages/api/policy/[policy_id]'
 import { PolicyRankedAssetsResponse } from '../../pages/api/policy/[policy_id]/ranks'
 import { FetchedTimestampResponse } from '../../pages/api/timestamp'
-import { POLLS_DB_PATH, TOOLS_PROD_CODE } from '../../constants'
+import { POLLS_DB_PATH } from '../../constants'
 
 const TheTool = () => {
   const { connected, hasNoKey, wallet } = useWallet()
@@ -39,11 +39,7 @@ const TheTool = () => {
 
   const [connectedStakeKey, setConnectedStakeKey] = useState('')
   const [settings, setSettings] = useState<SettingsType | undefined>(undefined)
-
-  const [sessionId, setSessionId] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
-
   const [showPastPolls, setShowPastPolls] = useState(false)
   const [pollPublished, setPollPublished] = useState(false)
   const [pollUrl, setPollUrl] = useState('')
@@ -64,37 +60,6 @@ const TheTool = () => {
     [settings]
   )
 
-  const recordSession = useCallback(async () => {
-    if (connectedStakeKey && (pollPublished || errorMessage)) {
-      const payload = {
-        stakeKey: connectedStakeKey,
-        errorMessage,
-        settings,
-        pollPublished,
-        pollUrl,
-      }
-
-      try {
-        if (!sessionId) {
-          const { data } = await axios.post('/main-api/tool-sessions/bad-poll', payload, {
-            headers: { tools_prod_code: TOOLS_PROD_CODE },
-          })
-          setSessionId(data.sessionId)
-        } else {
-          await axios.patch(`/main-api/tool-sessions/bad-poll?sessionId=${sessionId}`, payload, {
-            headers: { tools_prod_code: TOOLS_PROD_CODE },
-          })
-        }
-      } catch (error) {
-        console.error(error)
-      }
-    }
-  }, [sessionId, connectedStakeKey, errorMessage, settings, pollPublished, pollUrl])
-
-  useEffect(() => {
-    recordSession()
-  }, [recordSession])
-
   const fetchRankedAssets = useCallback(async (_policyId: string): Promise<RankedPolicyAsset[]> => {
     try {
       const { data } = await axios.get<PolicyRankedAssetsResponse>(`/api/policy/${_policyId}/ranks`)
@@ -103,10 +68,8 @@ const TheTool = () => {
     } catch (error: any) {
       console.error(error)
 
-      const errMsg = error.response.data || error.message
-      setErrorMessage(errMsg)
-
       if (error.response.status !== 500 && error.response.status !== 400) {
+        const errMsg = error.response.data || error.message
         addTranscript('ERROR', errMsg)
         return await fetchRankedAssets(_policyId)
       } else {
@@ -126,10 +89,8 @@ const TheTool = () => {
       } catch (error: any) {
         console.error(error)
 
-        const errMsg = error.response.data || error.message
-        setErrorMessage(errMsg)
-
         if (error.response.status !== 500 && error.response.status !== 400) {
+          const errMsg = error.response.data || error.message
           addTranscript('ERROR', errMsg)
           return await fetchPolicyAssets(_policyId, _allAssets)
         } else {
@@ -164,7 +125,6 @@ const TheTool = () => {
         toast.success('Connected!')
       } catch (error: any) {
         console.error(error)
-        setErrorMessage(error.message)
         addTranscript('ERROR', error.message)
         toast.dismiss()
         toast.error('Woopsies!')
@@ -180,7 +140,6 @@ const TheTool = () => {
   }, [loadWallet])
 
   const clickPublish = useCallback(async () => {
-    setErrorMessage('')
     setLoading(true)
     toast.loading('Processing...')
 
@@ -252,7 +211,6 @@ const TheTool = () => {
       toast.success('Published!')
     } catch (error: any) {
       console.error(error)
-      setErrorMessage(error.message)
       addTranscript('ERROR!', error.message)
       toast.dismiss()
       toast.error('Woopsies!')

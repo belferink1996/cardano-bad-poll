@@ -1,5 +1,3 @@
-export const TOOLS_PROD_CODE = process.env.NEXT_PUBLIC_TOOLS_PROD_CODE || ''
-
 export const FIREBASE_API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY
 export const FIREBASE_APP_ID = process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 export const FIREBASE_AUTH_DOMAIN = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
