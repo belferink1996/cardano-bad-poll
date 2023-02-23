@@ -2,10 +2,11 @@ import Head from 'next/head'
 import type { AppProps } from 'next/app'
 import { Fragment } from 'react'
 import { Toaster } from 'react-hot-toast'
+import '../styles/globals.css'
+import 'animate.css'
 import { WalletProvider } from '../contexts/WalletContext'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
-import '../styles/globals.css'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
