@@ -5,6 +5,9 @@ const nextConfig = {
   images: {
     domains: ['badfoxmc.com'],
   },
+  experimental: {
+    appDir: true,
+  },
   webpack: function (config, options) {
     config.experiments = {
       asyncWebAssembly: true,
