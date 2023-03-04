@@ -4,6 +4,7 @@ import { AnswerOptionType } from '../components/TheTool/Settings/PollSettings'
 export interface Poll {
   id: string
   stakeKey: string
+  allowPublicView: boolean
   active: boolean
   endAt: number
   holderSettings: HolderSettingsType[]
