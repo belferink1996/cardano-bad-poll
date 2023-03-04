@@ -33,7 +33,7 @@ const ConnectWallet = ({
         className='text-center'
       >
         {availableWallets.length == 0 ? (
-          <p className='my-2'>Nami not installed...</p>
+          <p className='my-2'>No wallets installed...</p>
         ) : (
           <div className='flex flex-col min-w-[280px] w-[85%] md:w-[75%] '>
             {availableWallets.map((wallet, idx) => (
