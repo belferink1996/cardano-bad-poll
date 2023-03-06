@@ -12,15 +12,17 @@ const ConnectWallet = ({
   disabled?: boolean
   disableTokenGate?: boolean
 }) => {
-  const { availableWallets, connectWallet, connecting, connected, hasNoKey } = useWallet()
+  const { availableWallets, connectWallet, connecting, connected, connectedName, hasNoKey } = useWallet()
   const [openModal, setOpenModal] = useState<boolean>(false)
+
+  const toggleModal = () => setOpenModal((prev) => !prev)
 
   return (
     <Fragment>
       <button
         type='button'
         disabled={disabled || connecting || connected || hasNoKey}
-        onClick={() => setOpenModal(true)}
+        onClick={() => toggleModal()}
         className='grow m-1 p-4 rounded-xl disabled:bg-gray-900 bg-green-900 hover:bg-green-700 disabled:bg-opacity-50 bg-opacity-50 hover:bg-opacity-50 disabled:text-gray-700 hover:text-gray-200 disabled:border border hover:border disabled:border-gray-800 border-green-700 hover:border-green-700 disabled:cursor-not-allowed hover:cursor-pointer'
       >
         Connect Wallet
@@ -29,10 +31,12 @@ const ConnectWallet = ({
       <Modal
         title={connected ? 'Wallet Connected' : 'Connect a Wallet'}
         open={!!openModal && !connecting && !connected}
-        onClose={() => setOpenModal(false)}
+        onClose={() => toggleModal()}
         className='text-center'
       >
-        {availableWallets.length == 0 ? (
+        {connected ? (
+          <p className='my-2'>Connected with: {connectedName}</p>
+        ) : availableWallets.length == 0 ? (
           <p className='my-2'>No wallets installed...</p>
         ) : (
           <div className='flex flex-col min-w-[280px] w-[85%] md:w-[75%] '>
@@ -47,7 +51,7 @@ const ConnectWallet = ({
                       addTranscript(str1, str2)
                     }
 
-                    setOpenModal(false)
+                    toggleModal()
                   })
                 }
                 disabled={connecting || connected}

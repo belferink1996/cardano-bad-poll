@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
 import { firestore } from '../../utils/firebase'
 import Modal from '../layout/Modal'
 import PollViewer from './PollViewer'
-import { FetchedTimestampResponse } from '../../pages/api/timestamp'
-import { Poll } from '../../@types'
-import { POLLS_DB_PATH } from '../../constants'
 import PollListItem from './PollListItem'
+import { FetchedTimestampResponse } from '../../pages/api/timestamp'
+import { POLLS_DB_PATH } from '../../constants'
+import { Poll } from '../../@types'
 
 interface PastPollsProps {
   stakeKey: string
