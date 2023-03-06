@@ -8,35 +8,65 @@ import '../../styles/sdk.css'
 
 const baseUrl = 'https://poll.badfoxmc.com'
 
-const Page = async ({
-  searchParams: { creator_stake_key: creatorStakeKey, voter_stake_key: voterStakeKey },
-}: {
-  searchParams: { creator_stake_key?: string; voter_stake_key?: string }
-}) => {
+interface PageProps {
+  params?: {}
+  searchParams?: {
+    creator_stake_key?: string
+    voter_stake_key?: string
+  }
+}
+
+const Page = async (props: PageProps) => {
+  const { searchParams } = props
+  if (!searchParams) {
+    return <p className='text-sm text-center'>Dev error: bad URL</p>
+  }
+
+  const { creator_stake_key: creatorStakeKey, voter_stake_key: voterStakeKey } = searchParams
   if (!creatorStakeKey || !voterStakeKey) {
     return <p className='text-sm text-center'>Dev error: stake key(s) not provided</p>
   }
 
   try {
     await axios.get(`${baseUrl}/api/wallet/${creatorStakeKey}`)
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.response?.status === 404) {
+      return (
+        <p className='text-sm text-center'>
+          Dev error: creator stake key invalid
+          <br />
+          {creatorStakeKey}
+        </p>
+      )
+    }
+
     return (
       <p className='text-sm text-center'>
-        Dev error: creator stake key invalid
+        Unknown error:
         <br />
-        {creatorStakeKey}
+        {error?.message}
       </p>
     )
   }
 
   try {
     await axios.get(`${baseUrl}/api/wallet/${voterStakeKey}`)
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.response?.status === 404) {
+      return (
+        <p className='text-sm text-center'>
+          Dev error: voter stake key invalid
+          <br />
+          {voterStakeKey}
+        </p>
+      )
+    }
+
     return (
       <p className='text-sm text-center'>
-        Dev error: voter stake key invalid
+        Unknown error:
         <br />
-        {voterStakeKey}
+        {error?.message}
       </p>
     )
   }
