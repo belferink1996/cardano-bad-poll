@@ -8,12 +8,18 @@ class BadPollSDK {
     this.iFrameWrapper = document.body.removeChild(this.iFrameWrapper)
   }
 
-  start({ stakeKey } = {}) {
+  start({ creatorStakeKey, voterStakeKey } = {}) {
     if (!document || !document.body) {
       throw new Error('document.body is not defined')
     }
 
-    const query = `?stake_key=${stakeKey}`
+    if (!creatorStakeKey || !voterStakeKey) {
+      throw new Error(
+        '400 BAD REQUEST; new BadPollSDK().start({ creatorStakeKey: "stake1...", voterStakeKey: "stake1..." })'
+      )
+    }
+
+    const query = `?creator_stake_key=${creatorStakeKey}&voter_stake_key=${voterStakeKey}`
     const src = this.frontUrl + query
     const isMobile = window.innerWidth <= 768
 
