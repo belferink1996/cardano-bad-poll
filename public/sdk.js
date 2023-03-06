@@ -37,7 +37,7 @@ class BadPollSDK {
       'style',
       `max-width: ${isMobile ? '100vw' : '555px'}; width: 100%; max-height: ${
         isMobile ? '100vh' : '70vh'
-      }; height: 100%; border: none; border-radius: ${isMobile ? '0' : '1rem'};`
+      }; height: 100%; border: none; border-radius: ${isMobile ? '0' : '1rem'}; box-shadow: 0 0 2px #fff;`
     )
 
     this.iFrame = this.iFrameWrapper.appendChild(this.iFrame)
