@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, useMemo, useEffect, ReactNode } from 'react'
+'use client'
+import { createContext, useState, useContext, useMemo, useEffect, ReactNode } from 'react'
 import { BrowserWallet, Wallet } from '@meshsdk/core'
 
 type ConnectFunc = (

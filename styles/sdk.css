@@ -2,7 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply text-gray-400;
+  }
+}
+
 html {
+  scrollbar-width: 0;
+  scrollbar-color: transparent;
   scroll-behavior: smooth;
 }
 
