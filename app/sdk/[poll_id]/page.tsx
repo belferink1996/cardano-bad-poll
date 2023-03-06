@@ -10,6 +10,8 @@ interface PageProps {
   }
 }
 
+export const dynamic = 'force-dynamic'
+
 const Page = async (props: PageProps) => {
   const { params, searchParams } = props
   if (!params || !searchParams) {
