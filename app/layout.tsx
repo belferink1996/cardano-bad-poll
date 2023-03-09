@@ -1,5 +1,6 @@
 import CloseButton from '../components/sdk/CloseButton'
 import PoweredBy from '../components/sdk/PoweredBy'
+import '../../styles/sdk.css'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
