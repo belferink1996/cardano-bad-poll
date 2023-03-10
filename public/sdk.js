@@ -1,25 +1,83 @@
 class BadPollSDK {
-  constructor() {
+  constructor({ creatorStakeKey }) {
+    this.creatorStakeKey = creatorStakeKey
     this.frontUrl = 'https://poll.badfoxmc.com/sdk'
+    this.supportedWallets = ['begin', 'eternl', 'flint', 'nami', 'nufi', 'gerowallet', 'typhoncip30']
   }
 
-  stop() {
-    this.iFrame = this.iFrameWrapper.removeChild(this.iFrame)
-    this.iFrameWrapper = document.body.removeChild(this.iFrameWrapper)
+  loadWallets = async (options) => {
+    const { injectId, buttonBackgroundColor = '#f5f5f5', buttonTextColor = '#00000' } = options || {}
+
+    if (!injectId) {
+      throw new Error(
+        '400 BAD REQUEST; new BadPollSDK({ creatorStakeKey: "stake1..." }).loadWallets({ injectId: "inject-wallets" })'
+      )
+    }
+
+    const cardano = window?.cardano || {}
+
+    const wallets = this.supportedWallets
+      .filter((str) => cardano[str] !== void 0)
+      .map((str) => ({
+        name: cardano[str].name,
+        icon: cardano[str].icon,
+        version: cardano[str].apiVersion,
+        apiName: str,
+      }))
+
+    const injectEl = document.getElementById(injectId)
+    injectEl.innerText = ''
+
+    const div = document.createElement('div')
+    wallets.forEach((obj) => {
+      const img = document.createElement('img')
+      img.src = obj.icon
+      img.style = 'width: 30px; height: 30px; margin: 0 0.5rem 0 0;'
+
+      const span = document.createElement('span')
+      span.innerText = obj.name
+
+      const btn = document.createElement('button')
+      btn.style = `width: 150px; height: 2.5rem; margin: 0.1rem; white-space: nowrap; color: ${buttonTextColor}; background-color: ${buttonBackgroundColor}; border: none; border-radius: 0.5rem;`
+
+      btn.appendChild(img)
+      btn.appendChild(span)
+      btn.onclick = async () => {
+        await this.connectAndStart(obj.apiName)
+        injectEl.innerText = ''
+      }
+
+      div.appendChild(btn)
+    })
+
+    injectEl.appendChild(div)
   }
 
-  start({ creatorStakeKey, voterStakeKey } = {}) {
+  connectAndStart = async (walletName) => {
+    const wallet = window?.cardano[walletName]
+
+    if (wallet) {
+      const connected = await wallet.enable()
+      const stakeKeys = await connected.getRewardAddresses()
+
+      this.start({ voterStakeKey: stakeKeys[0] })
+    } else {
+      window.alert(`${walletName} not installed :(`)
+    }
+  }
+
+  start({ voterStakeKey } = {}) {
     if (!document || !document.body) {
       throw new Error('document.body is not defined')
     }
 
-    if (!creatorStakeKey || !voterStakeKey) {
+    if (!this.creatorStakeKey || !voterStakeKey) {
       throw new Error(
-        '400 BAD REQUEST; new BadPollSDK().start({ creatorStakeKey: "stake1...", voterStakeKey: "stake1..." })'
+        '400 BAD REQUEST; new BadPollSDK({ creatorStakeKey: "stake1..." }).start({ voterStakeKey: "stake1..." })'
       )
     }
 
-    const query = `?creator_stake_key=${creatorStakeKey}&voter_stake_key=${voterStakeKey}`
+    const query = `?creator_stake_key=${this.creatorStakeKey}&voter_stake_key=${voterStakeKey}`
     const src = this.frontUrl + query
     const isMobile = window.innerWidth <= 768
 
@@ -54,5 +112,10 @@ class BadPollSDK {
         }
       }
     })
+  }
+
+  stop() {
+    this.iFrame = this.iFrameWrapper.removeChild(this.iFrame)
+    this.iFrameWrapper = document.body.removeChild(this.iFrameWrapper)
   }
 }
