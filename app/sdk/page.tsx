@@ -29,8 +29,12 @@ const Page = async (props: PageProps) => {
     return <p className='text-sm text-center'>Dev error: stake key(s) not provided</p>
   }
 
+  let cKey = ''
   try {
-    await axios.get(`${baseUrl}/api/wallet/${creatorStakeKey}`)
+    const {
+      data: { stakeKey },
+    } = await axios.get<{ stakeKey: string }>(`${baseUrl}/api/wallet/${creatorStakeKey}`)
+    cKey = stakeKey
   } catch (error: any) {
     if (error?.response?.status === 404) {
       return (
@@ -51,8 +55,12 @@ const Page = async (props: PageProps) => {
     )
   }
 
+  let vKey = ''
   try {
-    await axios.get(`${baseUrl}/api/wallet/${voterStakeKey}`)
+    const {
+      data: { stakeKey },
+    } = await axios.get<{ stakeKey: string }>(`${baseUrl}/api/wallet/${voterStakeKey}`)
+    vKey = stakeKey
   } catch (error: any) {
     if (error?.response?.status === 404) {
       return (
@@ -75,7 +83,7 @@ const Page = async (props: PageProps) => {
 
   const now = Date.now()
   const collection = firestore.collection(POLLS_DB_PATH)
-  const collectionQuery = await collection.where('stakeKey', '==', creatorStakeKey).get()
+  const collectionQuery = await collection.where('stakeKey', '==', cKey).get()
 
   const polls = collectionQuery.docs
     .map((doc) => {
@@ -96,7 +104,7 @@ const Page = async (props: PageProps) => {
         <p className='text-sm text-center hover:text-gray-200'>
           No polls yet for this stake key...
           <br />
-          {creatorStakeKey}
+          {cKey}
           <br />
           Click here to create your 1st poll
         </p>
@@ -107,7 +115,7 @@ const Page = async (props: PageProps) => {
   return polls.map((poll) => (
     <PollListItem
       key={`poll-${poll.id}`}
-      navToPage={`/sdk/${poll.id}?voter_stake_key=${voterStakeKey}`}
+      navToPage={`/sdk/${poll.id}?voter_stake_key=${vKey}`}
       active={poll.active}
       endAt={poll.endAt}
       question={poll.question}
